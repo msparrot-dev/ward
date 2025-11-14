@@ -159,7 +159,7 @@ app.post('/verify/:verifyId?', async (req, res) => {
 });
 
 const start = () => {
-        if (config.https) {
+        if (config.server.https) {
                 https.createServer({
                         key: fs.readFileSync('private.pem'),
                         cert: fs.readFileSync('certificate.pem')
