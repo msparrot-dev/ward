@@ -41,49 +41,49 @@ client.slashCommands = new Collection();
 const slashCommands = fs.readdirSync("./public/slash");
 
 for (const module of slashCommands) {
-	const commandFiles = fs
-		.readdirSync(`./public/slash/${module}`)
-		.filter((file) => file.endsWith(".js"));
+        const commandFiles = fs
+                .readdirSync(`./public/slash/${module}`)
+                .filter((file) => file.endsWith(".js"));
 
-	for (const commandFile of commandFiles) {
-		const command = require(`./public/slash/${module}/${commandFile}`);
-		client.slashCommands.set(command.data.name, command);
-	}
+        for (const commandFile of commandFiles) {
+                const command = require(`./public/slash/${module}/${commandFile}`);
+                client.slashCommands.set(command.data.name, command);
+        }
 }
 
 // —— Registration of Slash-Commands in Discord API
 const rest = new REST({ version: "9" }).setToken(config.Discord.token);
 
 const commandJsonData = [
-	...Array.from(client.slashCommands.values()).map((c) => c.data.toJSON()),
+        ...Array.from(client.slashCommands.values()).map((c) => c.data.toJSON()),
 ];
 
 (async () => {
-	try {
-		logger.success("Started refreshing application (/) commands.");
-		await rest.put(Routes.applicationGuildCommands(config.Discord.botId, config.Discord.guildId), { body: commandJsonData });
-		logger.success("Successfully reloaded application (/) commands.");
-	} catch (error) {
-		console.error(error);
-	}
+        try {
+                logger.success("Started refreshing application (/) commands.");
+                await rest.put(Routes.applicationGuildCommands(config.Discord.botId, config.Discord.guildId), { body: commandJsonData });
+                logger.success("Successfully reloaded application (/) commands.");
+        } catch (error) {
+                console.error(error);
+        }
 })();
 
 async function addRole(userID) {
     try {
-		const guild = await client.guilds.fetch(config.Discord.guildId),
-        	 role = await guild.roles.fetch(config.Discord.verifiedRole),
-          	 member = await guild.members.fetch(userID);
+                const guild = await client.guilds.fetch(config.Discord.guildId),
+                 role = await guild.roles.fetch(config.Discord.verifiedRole),
+                 member = await guild.members.fetch(userID);
 
         member.roles.add(role)
-			.catch(() => {
-				logger.error(`Failed to add role to user ${member.user.tag}! (Maybe verified role is above bot role?)`);
-				return;
-        	})
-			.then(() => {
-				logger.info(`Added verified role to user ${member.user.tag}.`);
-			})
+                        .catch(() => {
+                                logger.error(`Failed to add role to user ${member.user.tag}! (Maybe verified role is above bot role?)`);
+                                return;
+                })
+                        .then(() => {
+                                logger.info(`Added verified role to user ${member.user.tag}.`);
+                        })
     } catch (e) {
-		console.log(e)
+                console.log(e)
         logger.error(`Failed to add role to user ${userID}!`);
     }
 }
@@ -91,35 +91,35 @@ async function addRole(userID) {
 async function removeRole(userID) {
     const removeRole = config.Discord.removeRole
 
-	if(removeRole) {
-		try {
-			const guild = await client.guilds.fetch(config.Discord.guildId),
-				 removeRoleId = await guild.roles.fetch(config.Discord.removeRoleId),
-				 member = await guild.members.fetch(userID);
+        if(removeRole) {
+                try {
+                        const guild = await client.guilds.fetch(config.Discord.guildId),
+                                 removeRoleId = await guild.roles.fetch(config.Discord.removeRoleId),
+                                 member = await guild.members.fetch(userID);
 
-			member.roles.remove(removeRoleId)
-				.catch(() => {
-					logger.error(`Failed to remove role from user ${member.user.tag}! (Maybe role is above bot role?)`);
-					return;
-				})
-				.then(() => {
-					logger.info(`Removed role from user ${member.user.tag}.`);
-				})
-			
-		} catch(e) {
-			logger.error(`Failed to remove role from user ${userID}!`);
-		}
-	} else {
-		logger.info(`Remove role is set to false, step skipped.`)
-	}  
+                        member.roles.remove(removeRoleId)
+                                .catch(() => {
+                                        logger.error(`Failed to remove role from user ${member.user.tag}! (Maybe role is above bot role?)`);
+                                        return;
+                                })
+                                .then(() => {
+                                        logger.info(`Removed role from user ${member.user.tag}.`);
+                                })
+                        
+                } catch(e) {
+                        logger.error(`Failed to remove role from user ${userID}!`);
+                }
+        } else {
+                logger.info(`Remove role is set to false, step skipped.`)
+        }  
 }
 
 // —— Login into your client application with bot's token.
 client.login(config.Discord.token)
-	.catch(() => {
-		logger.fatal('Failed to login! Is your intents enabled?');
-		process.exit(0);
-	})
+        .catch(() => {
+                logger.fatal('Failed to login! Is your intents enabled?');
+                process.exit(0);
+        })
 
 // —— And another thingy.
 const app = express(),
@@ -159,14 +159,14 @@ app.post('/verify/:verifyId?', async (req, res) => {
 });
 
 const start = () => {
-	if (config.https) {
-		https.createServer({
-			key: fs.readFileSync('private.pem'),
-			cert: fs.readFileSync('certificate.pem')
-		}, app).listen(port, () => logger.info(`Listening on port ${port}.`));
-	} else {
-		app.listen(port, () => logger.info(`Listening on port ${port}.`));
-	}
+        if (config.https) {
+                https.createServer({
+                        key: fs.readFileSync('private.pem'),
+                        cert: fs.readFileSync('certificate.pem')
+                }, app).listen(port, '0.0.0.0', () => logger.info(`Listening on 0.0.0.0:${port}.`));
+        } else {
+                app.listen(port, '0.0.0.0', () => logger.info(`Listening on 0.0.0.0:${port}.`));
+        }
 }
 
 // —— Start the server
