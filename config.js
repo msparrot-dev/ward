@@ -9,10 +9,10 @@ module.exports = {
         token: process.env.DISCORD_BOT_TOKEN || "",
         botId: process.env.DISCORD_BOT_ID || "",
         guildId: process.env.DISCORD_GUILD_ID || "",
-        verifiedRole: process.env.DISCORD_VERIFIED_ROLE || "",
+        verifiedRole: process.env.DISCORD_VERIFIED_ROLE || "verified",
 
         removeRole: process.env.DISCORD_REMOVE_ROLE === 'true' || false,
-        removeRoleId: process.env.DISCORD_REMOVE_ROLE_ID || "",
+        removeRoleId: process.env.DISCORD_REMOVE_ROLE_ID || "1439043948680052948",
 
         statusType: parseInt(process.env.DISCORD_STATUS_TYPE) || 3,
         statusMsg: process.env.DISCORD_STATUS_MSG || "unverified users!",
